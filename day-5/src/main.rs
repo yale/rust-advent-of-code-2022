@@ -24,6 +24,24 @@ impl MoveInstruction {
             to: captures[3].parse::<usize>().expect("Could not parse digit") - 1
         }
     }
+
+    pub fn exec_part_1(self: &Self, stacks: &mut Stacks) {
+        for _ in 0..self.num {
+            let from_val = stacks[self.from].pop().expect("Expected a value in from vec");
+            stacks[self.to].push(from_val);
+        }
+    }
+
+    pub fn exec_part_2(self: &Self, stacks: &mut Stacks) {
+        let mut buffer: Vec<char> = Vec::new();
+        for _ in 0..self.num {
+            let from_val = stacks[self.from].pop().expect("Expected a value in from vec");
+            buffer.push(from_val);
+        }
+        while !buffer.is_empty() {
+            stacks[self.to].push(buffer.pop().unwrap());
+        }
+    }
 }
 
 fn main() {
@@ -43,33 +61,12 @@ fn main() {
 
     let contents = include_str!("input.txt").trim();
 
-    // Part 1
-    // contents.
-    //     lines().
-    //     map(MoveInstruction::parse).
-    //     for_each(|instruction| {
-    //         for _ in 0..instruction.num {
-    //             let from_val = stacks[instruction.from].pop().expect("Expected a value in from vec");
-    //             stacks[instruction.to].push(from_val);
-    //         }
-    //     });
-
-    // Part 2
     contents.
         lines().
         map(MoveInstruction::parse).
         for_each(|instruction| {
-            // Doing all this in-line since I couldn't figure out how
-            // to pass a ref to `stacks` into another struct's fn
-            // without causing the borrow checker to blow up
-            let mut buffer: Vec<char> = Vec::new();
-            for _ in 0..instruction.num {
-                let from_val = stacks[instruction.from].pop().expect("Expected a value in from vec");
-                buffer.push(from_val);
-            }
-            while !buffer.is_empty() {
-                stacks[instruction.to].push(buffer.pop().unwrap());
-            }
+            // instruction.exec_part_1(&mut stacks)
+            instruction.exec_part_2(&mut stacks)
         });
 
     for stack in stacks {
