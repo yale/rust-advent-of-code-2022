@@ -1,17 +1,25 @@
 use std::collections::HashSet;
+use std::hash::Hash;
+
+fn all_elements_uniq<T: Hash + Eq + Copy>(slice: &[T]) -> bool {
+    let mut set: HashSet<T> = HashSet::new();
+    for item in slice {
+        if set.contains(item) {
+            return false;
+        } else {
+            set.insert(*item);
+        }
+    }
+    true
+}
 
 fn index_of_first_n_distinct_chars(n: usize, string: &str) -> Option<usize> {
-    string.as_bytes().windows(n).enumerate().find(|(_, window)| {
-        let mut set: HashSet<u8> = HashSet::new();
-        for item in *window {
-            if set.contains(item) {
-                return false;
-            } else {
-                set.insert(*item);
-            }
-        }
-        true
-    }).map(|(index, _)| index + n)
+    string
+        .as_bytes()
+        .windows(n)
+        .enumerate()
+        .find(|(_, window)| all_elements_uniq(window))
+        .map(|(index, _)| index + n)
 }
 
 fn main() {
