@@ -35,7 +35,12 @@ impl Knot {
     }
 
     fn adjust_to(&mut self, knot: &Knot) {
-        if knot.1 > self.1 + 1 {
+        // If the knot is two away in any diagonal direction,
+        // split the difference
+        if (knot.0 - self.0).abs() == 2 && (knot.1 - self.1).abs() == 2 {
+            self.0 = (knot.0 + self.0) / 2;
+            self.1 = (knot.1 + self.1) / 2;
+        } else if knot.1 > self.1 + 1 {
             self.0 = knot.0;
             self.1 = knot.1 - 1;
         } else if knot.1 < self.1 - 1 {
