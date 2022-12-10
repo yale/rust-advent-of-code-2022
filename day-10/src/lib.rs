@@ -99,13 +99,6 @@ impl CPU {
             Op::Noop => (),
         };
     }
-
-    fn state(&self) -> CPUState {
-        CPUState {
-            x: self.x,
-            cycle: self.cycle,
-        }
-    }
 }
 
 impl Iterator for CPU {
@@ -117,8 +110,32 @@ impl Iterator for CPU {
         };
 
         self.tick();
-        Some(self.state())
+        let x = self.x;
+
+        Some(CPUState {
+            x,
+            cycle: self.cycle,
+        })
     }
+}
+
+pub fn to_crt_output_buffer(cpu: CPU) -> Vec<bool> {
+    cpu.map(|state| {
+        dbg!(&state);
+        dbg!(state.x.abs_diff(((state.cycle - 1) % 40) as isize) < 2)
+    })
+    .collect()
+}
+
+pub fn print_crt(output: &Vec<bool>) {
+    output.chunks(40).for_each(|chunk| {
+        let line: String = chunk
+            .into_iter()
+            .map(|on_or_off| if *on_or_off { '#' } else { '.' })
+            .collect();
+
+        println!("{}", line);
+    });
 }
 
 #[cfg(test)]
@@ -152,5 +169,17 @@ mod tests {
             .sum();
 
         assert_eq!(strength, 13140);
+    }
+
+    #[test]
+    fn crt() {
+        let instrs = "addx 15\naddx -11\naddx 6\naddx -3\naddx 5\naddx -1\naddx -8\naddx 13\naddx 4\nnoop\naddx -1\naddx 5\naddx -1\naddx 5\naddx -1\naddx 5\naddx -1\naddx 5\naddx -1\naddx -35\naddx 1\naddx 24\naddx -19\naddx 1\naddx 16\naddx -11\nnoop\nnoop\naddx 21\naddx -15\nnoop\nnoop\naddx -3\naddx 9\naddx 1\naddx -3\naddx 8\naddx 1\naddx 5\nnoop\nnoop\nnoop\nnoop\nnoop\naddx -36\nnoop\naddx 1\naddx 7\nnoop\nnoop\nnoop\naddx 2\naddx 6\nnoop\nnoop\nnoop\nnoop\nnoop\naddx 1\nnoop\nnoop\naddx 7\naddx 1\nnoop\naddx -13\naddx 13\naddx 7\nnoop\naddx 1\naddx -33\nnoop\nnoop\nnoop\naddx 2\nnoop\nnoop\nnoop\naddx 8\nnoop\naddx -1\naddx 2\naddx 1\nnoop\naddx 17\naddx -9\naddx 1\naddx 1\naddx -3\naddx 11\nnoop\nnoop\naddx 1\nnoop\naddx 1\nnoop\nnoop\naddx -13\naddx -19\naddx 1\naddx 3\naddx 26\naddx -30\naddx 12\naddx -1\naddx 3\naddx 1\nnoop\nnoop\nnoop\naddx -9\naddx 18\naddx 1\naddx 2\nnoop\nnoop\naddx 9\nnoop\nnoop\nnoop\naddx -1\naddx 2\naddx -37\naddx 1\naddx 3\nnoop\naddx 15\naddx -21\naddx 22\naddx -6\naddx 1\nnoop\naddx 2\naddx 1\nnoop\naddx -10\nnoop\nnoop\naddx 20\naddx 1\naddx 2\naddx 2\naddx -6\naddx -11\nnoop\nnoop\nnoop";
+
+        let mut cpu = CPU::init();
+        cpu.push_instr(instrs);
+
+        let crt_output = to_crt_output_buffer(cpu);
+
+        print_crt(&crt_output);
     }
 }

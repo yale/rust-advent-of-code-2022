@@ -1,4 +1,4 @@
-use day_10::CPU;
+use day_10::{print_crt, to_crt_output_buffer, CPU};
 
 fn main() {
     let contents = include_str!("input.txt").trim();
@@ -11,4 +11,9 @@ fn main() {
         .sum();
 
     println!("{}", strength);
+
+    // Part 2
+    let mut cpu_2 = CPU::init();
+    cpu_2.push_instr(contents);
+    print_crt(&to_crt_output_buffer(cpu_2));
 }
