@@ -1,0 +1,10 @@
+[package]
+name = "day-7"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+trees = "0.4.2"
+unique_id = "0.1.5"
